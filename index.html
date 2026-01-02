@@ -2,49 +2,71 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>曼谷-北碧 3天2夜包車行程</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>曼谷-北碧 3天2夜 | 專屬行程</title>
+    
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 React 和 ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- 引入 Babel 用於解析 JSX -->
+    <!-- 引入 Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        thai: ['"Noto Sans Thai"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        day1: { light: '#E0F2FE', main: '#0EA5E9', dark: '#0369A1' }, // Sky Blue
+                        day2: { light: '#DCFCE7', main: '#22C55E', dark: '#15803D' }, // Nature Green
+                        day3: { light: '#FFEDD5', main: '#F97316', dark: '#C2410C' }, // History Orange
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                    }
+                }
+            }
+        }
+    </script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap');
-        
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8fafc;
+            background-color: #F8FAFC;
             -webkit-tap-highlight-color: transparent;
         }
-        .font-thai {
-            font-family: 'Noto Sans Thai', sans-serif;
-        }
-        /* 自定義捲軸隱藏但可捲動 */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* 動畫效果 */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
+        
+        /* 隱藏捲軸但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 動畫 */
+        @keyframes slideInUp {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+        .animate-enter { animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* 毛玻璃效果 */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
-        .animate-slide-up {
-            animation: slideUp 0.4s ease-out forwards;
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.5);
         }
     </style>
 </head>
@@ -52,36 +74,36 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
 
-        // --- Icons (SVG Components) ---
-        const Icon = ({ path, className }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        // --- Icons (使用 Lucide 風格 SVG) ---
+        const Icon = ({ path, className, size = 20 }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 {path}
             </svg>
         );
 
         const Icons = {
-            MapPin: (props) => <Icon {...props} path={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} />,
-            Calendar: (props) => <Icon {...props} path={<><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></>} />,
-            Hotel: (props) => <Icon {...props} path={<><path d="M12 2a2 2 0 0 1 2 2v2.5h3A2.5 2.5 0 0 1 19.5 9v9h-15V9A2.5 2.5 0 0 1 7 6.5h3V4a2 2 0 0 1 2-2Z"/><path d="M7 18v4"/><path d="M17 18v4"/><rect width="3" height="3" x="10.5" y="11" rx="1"/></>} />,
-            Coffee: (props) => <Icon {...props} path={<><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></>} />,
-            Camera: (props) => <Icon {...props} path={<><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></>} />,
-            Sun: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
-            Utensils: (props) => <Icon {...props} path={<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></>} />,
-            CloudRain: (props) => <Icon {...props} path={<><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></>} />,
-            Info: (props) => <Icon {...props} path={<><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></>} />,
-            Train: (props) => <Icon {...props} path={<><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></>} />,
-            ShieldAlert: (props) => <Icon {...props} path={<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></>} />,
-            Phone: (props) => <Icon {...props} path={<><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></>} />,
-            Navigation: (props) => <Icon {...props} path={<><polygon points="3 11 22 2 13 21 11 13 3 11"/></>} />,
-            X: (props) => <Icon {...props} path={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />,
-            ArrowRight: (props) => <Icon {...props} path={<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>} />,
-            Users: (props) => <Icon {...props} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
-            Siren: (props) => <Icon {...props} path={<><path d="M7 12a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v6H7v-6Z"/><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2H5v-2Z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/><path d="M12 12v6"/></>} />
+            MapPin: (p) => <Icon {...p} path={<><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} />,
+            Calendar: (p) => <Icon {...p} path={<><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></>} />,
+            Hotel: (p) => <Icon {...p} path={<><path d="M12 2a2 2 0 0 1 2 2v2.5h3A2.5 2.5 0 0 1 19.5 9v9h-15V9A2.5 2.5 0 0 1 7 6.5h3V4a2 2 0 0 1 2-2Z"/><path d="M7 18v4"/><path d="M17 18v4"/><rect width="3" height="3" x="10.5" y="11" rx="1"/></>} />,
+            Coffee: (p) => <Icon {...p} path={<><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" x2="6" y1="2" y2="4"/><line x1="10" x2="10" y1="2" y2="4"/><line x1="14" x2="14" y1="2" y2="4"/></>} />,
+            Camera: (p) => <Icon {...p} path={<><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></>} />,
+            Sun: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
+            Utensils: (p) => <Icon {...p} path={<><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></>} />,
+            CloudRain: (p) => <Icon {...p} path={<><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></>} />,
+            Info: (p) => <Icon {...p} path={<><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></>} />,
+            Train: (p) => <Icon {...p} path={<><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h0"/><path d="M16 15h0"/></>} />,
+            ShieldAlert: (p) => <Icon {...p} path={<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M12 8v4"/><path d="M12 16h.01"/></>} />,
+            Phone: (p) => <Icon {...p} path={<><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></>} />,
+            Navigation: (p) => <Icon {...p} path={<><polygon points="3 11 22 2 13 21 11 13 3 11"/></>} />,
+            X: (p) => <Icon {...p} path={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />,
+            ArrowRight: (p) => <Icon {...p} path={<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>} />,
+            Users: (p) => <Icon {...p} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
+            Siren: (p) => <Icon {...p} path={<><path d="M7 12a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v6H7v-6Z"/><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2H5v-2Z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/><path d="M12 12v6"/></>} />
         };
 
-        // --- Data (Updated with Chinese/English Names) ---
+        // --- Data ---
         const TRIP_DATES = "2026/01/30 - 02/01";
         const PLACES = {
           hotel_bkk_start: { id: 'hotel_bkk_start', name: '曼谷素坤逸假日酒店 (Holiday Inn Bangkok Sukhumvit)', nameThai: 'ฮอลิเดย์ อินน์ กรุงเทพฯ สุขุมวิท', address: '1 Sukhumvit 22, Klongton, Klongtoey, Bangkok 10110', googleQuery: 'Holiday Inn Bangkok Sukhumvit', type: 'hotel' },
@@ -129,366 +151,343 @@
           ]
         };
 
+        // --- Colors & Themes ---
+        const themeConfig = {
+            day1: { bg: 'bg-day1-light', text: 'text-day1-dark', border: 'border-day1-main', ring: 'ring-day1-main', iconBg: 'bg-day1-main', gradient: 'from-cyan-500 to-blue-500' },
+            day2: { bg: 'bg-day2-light', text: 'text-day2-dark', border: 'border-day2-main', ring: 'ring-day2-main', iconBg: 'bg-day2-main', gradient: 'from-emerald-400 to-green-600' },
+            day3: { bg: 'bg-day3-light', text: 'text-day3-dark', border: 'border-day3-main', ring: 'ring-day3-main', iconBg: 'bg-day3-main', gradient: 'from-orange-400 to-red-500' },
+            info: { bg: 'bg-slate-100', text: 'text-slate-800', border: 'border-slate-300', ring: 'ring-slate-400', iconBg: 'bg-slate-700', gradient: 'from-slate-700 to-slate-900' }
+        };
+
         // --- Components ---
 
-        // 1. Driver/Location Card
-        const DriverCard = ({ place, onClose }) => {
+        const Modal = ({ children, isOpen, onClose, borderColor = "border-gray-200" }) => {
             useEffect(() => {
-                document.body.style.overflow = 'hidden';
+                if (isOpen) document.body.style.overflow = 'hidden';
+                else document.body.style.overflow = 'unset';
                 return () => { document.body.style.overflow = 'unset'; };
-            }, []);
+            }, [isOpen]);
+
+            if (!isOpen) return null;
 
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 animate-fade-in" onClick={onClose}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-4 text-center shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">Show to Driver</h3>
-                            <button onClick={onClose} className="p-2 -mr-2 -mt-2 hover:bg-gray-100 rounded-full text-gray-400">
-                                <Icons.X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        
-                        <div className="py-4 border-b border-gray-100">
-                            <h2 className="text-3xl font-bold text-gray-900 leading-tight mb-3 font-thai">{place.nameThai}</h2>
-                            <p className="text-gray-600 text-lg font-medium">{place.name}</p>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-xl text-left border border-gray-100">
-                            <p className="text-xs text-gray-500 mb-1 font-bold uppercase">Address</p>
-                            <p className="text-sm text-gray-800 leading-relaxed font-thai">{place.address}</p>
-                        </div>
-
-                        <a 
-                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.googleQuery)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg shadow-blue-200"
-                        >
-                            <Icons.Navigation className="w-6 h-6" />
-                            開啟地圖 (Google Maps)
-                        </a>
-                    </div>
-                </div>
-            );
-        };
-
-        // 2. SOS / Emergency Card
-        const SOSCard = ({ onClose }) => {
-            useEffect(() => {
-                document.body.style.overflow = 'hidden';
-                return () => { document.body.style.overflow = 'unset'; };
-            }, []);
-
-            return (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-red-600/90 p-4 animate-fade-in" onClick={onClose}>
-                    <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-6 text-center shadow-2xl relative border-4 border-red-500" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center border-b border-gray-100 pb-2">
-                            <h3 className="text-red-600 font-bold text-lg flex items-center gap-2">
-                                <Icons.Siren className="w-6 h-6" /> 緊急求救 SOS
-                            </h3>
-                            <button onClick={onClose} className="p-2 -mr-2 hover:bg-red-50 rounded-full text-gray-400">
-                                <Icons.X className="w-6 h-6" />
-                            </button>
-                        </div>
-                        
-                        <div className="space-y-6">
-                            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-                                <p className="text-sm text-gray-500 mb-1">我是遊客，我迷路了</p>
-                                <p className="text-3xl font-bold text-gray-900 font-thai leading-snug">
-                                    ฉันหลงทาง<br/>ช่วยฉันด้วย
-                                </p>
-                            </div>
-
-                            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-                                <p className="text-sm text-gray-500 mb-1">請幫我打電話給這個號碼</p>
-                                <p className="text-xl font-bold text-gray-900 font-thai mb-2">
-                                    ช่วยโทรหาเบอร์นี้ให้หน่อย
-                                </p>
-                                <div className="h-10 border-b-2 border-dashed border-gray-300 flex items-end justify-center text-gray-400 font-mono">
-                                    (在此填寫司機電話)
-                                </div>
-                            </div>
-                        </div>
-
-                        <button 
-                            onClick={onClose}
-                            className="w-full bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors"
-                        >
-                            關閉 Close
-                        </button>
-                    </div>
-                </div>
-            );
-        };
-
-        const TimelineItem = ({ item, isLast, onShowLocation }) => {
-            const place = item.placeId ? PLACES[item.placeId] : null;
-            const IconComponent = item.icon ? Icons[item.icon] : Icons.MapPin;
-
-            return (
-                <div className="flex gap-4 group">
-                    <div className="flex flex-col items-center min-w-[3.5rem]">
-                        <span className="text-sm font-bold text-blue-600 font-mono mt-1">{item.time}</span>
-                        <div className="h-full w-px bg-gray-200 my-2 relative">
-                            {!isLast && <div className="absolute inset-x-0 top-0 bottom-0 bg-gray-200" />}
-                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 z-10 bg-white ${place ? 'border-blue-500' : 'border-gray-400'}`} />
-                        </div>
-                    </div>
-
-                    <div className="flex-1 pb-6">
-                        <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow active:scale-[0.99] duration-200">
-                            <div className="flex justify-between items-start mb-2">
-                                <h3 className="font-bold text-gray-800 text-lg leading-snug">
-                                    {place ? place.name : item.note.split('：')[0]}
-                                </h3>
-                                <div className={`p-2 rounded-full ${place ? 'bg-blue-50 text-blue-500' : 'bg-gray-100 text-gray-400'}`}>
-                                    <IconComponent className="w-4 h-4" />
-                                </div>
-                            </div>
-                            
-                            {place && (
-                                <p className="text-xs text-gray-500 mb-3 line-clamp-1 font-thai">{place.nameThai}</p>
-                            )}
-                            
-                            <div className="text-sm text-gray-600 mb-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100 leading-relaxed">
-                                {item.note}
-                            </div>
-
-                            {place && (
-                                <button 
-                                    onClick={() => onShowLocation(place)}
-                                    className="w-full bg-white border border-blue-200 text-blue-600 text-sm font-bold py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-50 active:bg-blue-100 transition-colors"
-                                >
-                                    <Icons.MapPin className="w-4 h-4" /> 
-                                    <span>司機卡 & 導航</span>
-                                    <Icons.ArrowRight className="w-4 h-4 ml-auto opacity-50" />
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const TipsCard = ({ title, iconName, children, color = "blue" }) => {
-            const IconComponent = Icons[iconName] || Icons.Info;
-            const colorClasses = {
-                blue: "bg-blue-50 text-blue-900 border-blue-100",
-                amber: "bg-amber-50 text-amber-900 border-amber-100",
-                rose: "bg-rose-50 text-rose-900 border-rose-100",
-                red: "bg-red-50 text-red-900 border-red-100"
-            };
-            const iconColors = {
-                blue: "text-blue-600",
-                amber: "text-amber-600",
-                rose: "text-rose-600",
-                red: "text-red-600"
-            };
-
-            return (
-                <div className={`p-5 rounded-xl border ${colorClasses[color]} mb-4 shadow-sm`}>
-                    <div className="flex items-center gap-2 mb-3 font-bold text-base border-b border-black/5 pb-2">
-                        <IconComponent className={`w-5 h-5 ${iconColors[color]}`} />
-                        {title}
-                    </div>
-                    <div className="text-sm leading-relaxed opacity-90 font-medium">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+                    <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"></div>
+                    <div 
+                        className={`bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative z-10 animate-[slideInUp_0.3s_ease-out] border-4 ${borderColor}`}
+                        onClick={e => e.stopPropagation()}
+                    >
                         {children}
                     </div>
                 </div>
             );
         };
 
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('day1');
-            const [selectedPlace, setSelectedPlace] = useState(null);
-            const [showSOS, setShowSOS] = useState(false);
-
-            // 處理捲動到頂部
-            const handleTabChange = (tab) => {
-                setActiveTab(tab);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
+        const DriverCard = ({ place, onClose }) => {
             return (
-                <div className="min-h-screen bg-gray-50 font-sans max-w-md mx-auto shadow-2xl overflow-hidden relative pb-24">
-                    {/* Header */}
-                    <header className="bg-gradient-to-br from-teal-600 to-blue-700 text-white p-6 pb-16 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Icons.MapPin className="w-32 h-32" />
+                <Modal isOpen={true} onClose={onClose} borderColor="border-blue-500">
+                    <div className="text-center space-y-5">
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold uppercase tracking-widest text-blue-500 bg-blue-50 px-2 py-1 rounded">Driver Card</span>
+                            <button onClick={onClose} className="p-2 -mr-2 -mt-2 bg-gray-100 rounded-full hover:bg-gray-200"><Icons.X size={20}/></button>
                         </div>
-                        <div className="relative z-10 mt-2">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold mb-3 backdrop-blur-md border border-white/20 shadow-sm">
-                                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                                6人同行包車遊
-                            </div>
-                            <h1 className="text-3xl font-extrabold mb-2 tracking-tight">曼谷 & 北碧府<br/>3天2夜之旅</h1>
-                            <div className="flex items-center gap-2 text-blue-100 text-sm font-medium">
-                                <Icons.Calendar className="w-4 h-4" />
-                                {TRIP_DATES}
-                            </div>
+                        
+                        <div>
+                            <h2 className="text-4xl font-thai font-bold text-slate-900 leading-tight mb-2 drop-shadow-sm">{place.nameThai}</h2>
+                            <p className="text-slate-500 font-medium text-lg leading-snug">{place.name}</p>
                         </div>
-                    </header>
 
-                    {/* Tabs */}
-                    <div className="flex justify-center -mt-8 px-4 mb-6 relative z-20">
-                        <div className="bg-white p-1.5 rounded-2xl shadow-xl flex w-full max-w-xs ring-1 ring-black/5">
-                            {['day1', 'day2', 'day3', 'info'].map((tab) => (
-                                <button
-                                    key={tab}
-                                    onClick={() => handleTabChange(tab)}
-                                    className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 ${
-                                        activeTab === tab 
-                                            ? 'bg-blue-600 text-white shadow-md transform scale-105' 
-                                            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    {tab === 'info' ? '指南' : tab.replace('day', 'Day ')}
-                                </button>
-                            ))}
+                        <div className="bg-slate-50 p-4 rounded-xl text-left border border-slate-100">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">Address</p>
+                            <p className="text-sm text-slate-700 font-thai leading-relaxed">{place.address}</p>
+                        </div>
+
+                        <a 
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.googleQuery)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-3 w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] transition-all"
+                        >
+                            <Icons.Navigation size={24} />
+                            <span>開啟導航 (Map)</span>
+                        </a>
+                    </div>
+                </Modal>
+            );
+        };
+
+        const SOSCard = ({ onClose }) => (
+            <Modal isOpen={true} onClose={onClose} borderColor="border-red-500">
+                 <div className="text-center space-y-6">
+                    <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                        <h3 className="text-red-600 font-bold text-xl flex items-center gap-2">
+                            <Icons.Siren className="animate-pulse" /> 緊急求救 SOS
+                        </h3>
+                        <button onClick={onClose} className="p-2 -mr-2 bg-red-50 rounded-full text-red-400 hover:bg-red-100"><Icons.X size={20}/></button>
+                    </div>
+                    
+                    <div className="bg-red-50 p-5 rounded-2xl border border-red-100">
+                        <p className="text-xs text-red-400 mb-2 font-bold uppercase tracking-wide">Show to Locals</p>
+                        <p className="text-3xl font-bold text-slate-900 font-thai leading-snug mb-2">
+                            ฉันหลงทาง<br/>ช่วยฉันด้วย
+                        </p>
+                        <p className="text-sm text-slate-500">( 我迷路了，請幫幫我 )</p>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border-2 border-dashed border-slate-200">
+                        <p className="text-sm text-slate-500 mb-1">請幫我打電話給 (Please call):</p>
+                        <p className="text-xl font-bold text-slate-900 font-thai mb-2">
+                            ช่วยโทรหาเบอร์นี้ให้หน่อย
+                        </p>
+                         <div className="h-8 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-sm font-mono">
+                            [ 填寫電話 / Write Number Here ]
                         </div>
                     </div>
 
+                    <button onClick={onClose} className="w-full bg-slate-200 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-300 transition-colors">
+                        關閉 Close
+                    </button>
+                </div>
+            </Modal>
+        );
+
+        const TimelineItem = ({ item, isLast, onShowLocation, theme }) => {
+            const place = item.placeId ? PLACES[item.placeId] : null;
+            const IconComponent = item.icon ? Icons[item.icon] : Icons.MapPin;
+
+            return (
+                <div className="flex gap-4 group relative pl-2">
+                     {/* Line */}
+                    <div className={`absolute left-[3.25rem] top-10 bottom-[-1rem] w-[2px] ${isLast ? 'bg-transparent' : 'bg-slate-200'}`}></div>
+
+                    {/* Time */}
+                    <div className="flex flex-col items-center w-12 pt-1 z-10">
+                        <span className={`text-sm font-bold font-display ${theme.text}`}>{item.time}</span>
+                        <div className={`w-3 h-3 rounded-full mt-2 border-2 bg-white ${theme.border} ${theme.ring} ring-2 ring-offset-2`}></div>
+                    </div>
+
+                    {/* Card */}
+                    <div className="flex-1 pb-6">
+                        <div className="bg-white rounded-2xl p-4 shadow-card border border-slate-100 hover:shadow-soft transition-all duration-300">
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 className="font-bold text-slate-800 text-lg leading-snug pr-2">
+                                        {place ? place.name.split('(')[0] : item.note.split('：')[0]}
+                                    </h3>
+                                    {place && <p className="text-xs text-slate-400 font-thai mt-0.5 line-clamp-1">{place.nameThai}</p>}
+                                </div>
+                                <div className={`p-2 rounded-xl shrink-0 ${theme.bg} ${theme.text}`}>
+                                    <IconComponent size={18} />
+                                </div>
+                            </div>
+                            
+                            <div className="text-sm text-slate-600 mb-4 bg-slate-50/50 p-2.5 rounded-lg leading-relaxed">
+                                {item.note}
+                            </div>
+
+                            {place && (
+                                <button 
+                                    onClick={() => onShowLocation(place)}
+                                    className={`w-full group/btn relative overflow-hidden rounded-xl bg-white border ${theme.border} ${theme.text} text-sm font-bold py-3 flex items-center justify-center gap-2 hover:${theme.bg} transition-all active:scale-[0.98]`}
+                                >
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <Icons.MapPin size={16} /> 
+                                        <span>司機卡 & 導航</span>
+                                    </span>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TripApp = () => {
+            const [activeTab, setActiveTab] = useState('day1');
+            const [selectedPlace, setSelectedPlace] = useState(null);
+            const [showSOS, setShowSOS] = useState(false);
+            const [scrolled, setScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 20);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const currentTheme = themeConfig[activeTab];
+
+            // Render content based on active tab
+            const renderContent = () => {
+                if (activeTab === 'info') {
+                    return (
+                        <div className="space-y-6 animate-enter px-1">
+                            {/* SOS Section */}
+                             <div className="bg-white rounded-2xl p-5 shadow-soft border border-red-100">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-3 bg-red-100 rounded-full text-red-600"><Icons.Users size={24}/></div>
+                                    <div>
+                                        <h3 className="font-bold text-slate-800">走失應變 (Emergency)</h3>
+                                        <p className="text-xs text-slate-500">會合點：售票口 / 大廳 / 原地</p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => setShowSOS(true)}
+                                    className="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-500/30 hover:scale-[1.02] transition-transform"
+                                >
+                                    <Icons.Siren size={20} className="animate-pulse" />
+                                    顯示泰文求救卡 (SOS Card)
+                                </button>
+                            </div>
+
+                            {/* Packing List */}
+                            <div className="bg-white rounded-2xl p-5 shadow-card">
+                                <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                    <Icons.ShieldAlert size={20} className="text-rose-500"/> 必帶物品
+                                </h3>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {['溯溪鞋/涼鞋', '泳衣/毛巾', '防水袋', '防蚊/防曬', '常備藥品', '現金'].map(item => (
+                                        <div key={item} className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span> {item}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                             {/* Contact */}
+                             <div className="bg-white rounded-2xl p-5 shadow-card">
+                                <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                    <Icons.Phone size={20} className="text-amber-500"/> 重要電話
+                                </h3>
+                                <div className="space-y-3">
+                                    <a href="tel:+6634513855" className="flex justify-between items-center p-3 bg-amber-50 rounded-xl text-amber-900">
+                                        <span className="text-sm font-medium">Keeree Tara</span>
+                                        <span className="font-mono font-bold">+66 34 513 855</span>
+                                    </a>
+                                     <a href="tel:0657276888" className="flex justify-between items-center p-3 bg-amber-50 rounded-xl text-amber-900">
+                                        <span className="text-sm font-medium">Bubble Forest</span>
+                                        <span className="font-mono font-bold">065-727-6888</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div className="animate-enter pb-8">
+                        <div className="flex items-center gap-3 mb-6 px-2">
+                            <div className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${currentTheme.gradient}`}></div>
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                                    {activeTab === 'day1' && '文化與河景'}
+                                    {activeTab === 'day2' && '瀑布與生態'}
+                                    {activeTab === 'day3' && '鐵道歷史行'}
+                                </h2>
+                                <p className="text-xs text-slate-500 font-medium">
+                                    {activeTab === 'day1' && 'Day 1 • 曼谷 → 北碧'}
+                                    {activeTab === 'day2' && 'Day 2 • 國家公園日'}
+                                    {activeTab === 'day3' && 'Day 3 • 北碧 → 曼谷'}
+                                </p>
+                            </div>
+                        </div>
+
+                         {/* Day Specific Alerts */}
+                         {activeTab === 'day2' && (
+                            <div className="mx-2 mb-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-xl flex gap-3 shadow-sm">
+                                <div className="bg-white p-2 rounded-full h-fit text-emerald-600 shadow-sm"><Icons.ShieldAlert size={18}/></div>
+                                <div>
+                                    <p className="text-sm font-bold text-emerald-800">體力日提醒</p>
+                                    <p className="text-xs text-emerald-700 mt-1">請務必攜帶溯溪鞋、泳衣、毛巾與防水袋。</p>
+                                </div>
+                            </div>
+                         )}
+
+                         {activeTab === 'day3' && (
+                             <div className="mx-2 mb-6 bg-orange-50 border border-orange-100 p-3 rounded-xl flex items-center gap-3 text-orange-800 text-sm">
+                                <Icons.Train size={18} className="shrink-0"/>
+                                <span className="text-xs font-medium">火車誤點屬常態，司機會在終點站等候。</span>
+                             </div>
+                         )}
+
+                        <div className="space-y-1">
+                            {ITINERARY[activeTab].map((item, index) => (
+                                <TimelineItem 
+                                    key={index} 
+                                    item={item} 
+                                    isLast={index === ITINERARY[activeTab].length - 1} 
+                                    onShowLocation={setSelectedPlace}
+                                    theme={currentTheme}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen font-sans max-w-md mx-auto relative bg-[#F8FAFC]">
+                    {/* Header */}
+                    <header className={`sticky top-0 z-40 transition-all duration-300 ${scrolled ? 'glass shadow-sm pt-4 pb-2' : 'bg-transparent pt-8 pb-4'}`}>
+                        <div className="px-6 flex justify-between items-center">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Trip Itinerary</p>
+                                <h1 className="text-2xl font-display font-extrabold text-slate-800">Bangkok &<br/>Kanchanaburi</h1>
+                            </div>
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                                <span className="font-display font-bold text-lg">6</span>
+                            </div>
+                        </div>
+
+                        {/* Navigation Pills */}
+                        <div className="mt-6 px-4 pb-2 overflow-x-auto no-scrollbar flex gap-3">
+                            {['day1', 'day2', 'day3', 'info'].map((tab) => {
+                                const isActive = activeTab === tab;
+                                const theme = themeConfig[tab];
+                                return (
+                                    <button
+                                        key={tab}
+                                        onClick={() => { setActiveTab(tab); window.scrollTo({top:0, behavior:'smooth'}); }}
+                                        className={`
+                                            whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300
+                                            ${isActive 
+                                                ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg scale-105` 
+                                                : 'bg-white text-slate-400 shadow-sm border border-slate-100 hover:bg-slate-50'}
+                                        `}
+                                    >
+                                        {tab === 'info' ? '指南 Info' : tab.replace('day', 'Day ')}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </header>
+
                     {/* Main Content */}
-                    <main className="px-5 pb-10">
-                        {activeTab === 'day1' && (
-                            <div className="space-y-1 animate-slide-up">
-                                <div className="flex items-center gap-2 mb-6 ml-1">
-                                    <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
-                                    <div>
-                                        <h2 className="text-gray-900 font-bold text-lg">曼谷出發 & 天空步道</h2>
-                                        <p className="text-xs text-gray-500">佛統大塔 · 虎窟寺 · 河景晚餐</p>
-                                    </div>
-                                </div>
-                                {ITINERARY.day1.map((item, index) => (
-                                    <TimelineItem key={index} item={item} isLast={index === ITINERARY.day1.length - 1} onShowLocation={setSelectedPlace} />
-                                ))}
-                            </div>
-                        )}
-
-                        {activeTab === 'day2' && (
-                            <div className="space-y-1 animate-slide-up">
-                                <div className="flex items-center gap-2 mb-6 ml-1">
-                                    <div className="w-1 h-8 bg-amber-500 rounded-full"></div>
-                                    <div>
-                                        <h2 className="text-gray-900 font-bold text-lg">瀑布 & 野生動物園</h2>
-                                        <p className="text-xs text-gray-500">Erawan 七層瀑布 · 長頸鹿合照</p>
-                                    </div>
-                                </div>
-                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-xl p-4 mb-6 flex gap-3 text-sm text-amber-900 shadow-sm">
-                                    <Icons.ShieldAlert className="w-5 h-5 shrink-0 text-amber-600" />
-                                    <p className="font-medium">今日是體力日！請攜帶溯溪鞋、泳衣、毛巾、乾袋。</p>
-                                </div>
-                                {ITINERARY.day2.map((item, index) => (
-                                    <TimelineItem key={index} item={item} isLast={index === ITINERARY.day2.length - 1} onShowLocation={setSelectedPlace} />
-                                ))}
-                            </div>
-                        )}
-
-                        {activeTab === 'day3' && (
-                            <div className="space-y-1 animate-slide-up">
-                                <div className="flex items-center gap-2 mb-6 ml-1">
-                                    <div className="w-1 h-8 bg-rose-500 rounded-full"></div>
-                                    <div>
-                                        <h2 className="text-gray-900 font-bold text-lg">歷史鐵道 & 返回曼谷</h2>
-                                        <p className="text-xs text-gray-500">死亡鐵路火車 · 懸崖木棧道</p>
-                                    </div>
-                                </div>
-                                {ITINERARY.day3.map((item, index) => (
-                                    <TimelineItem key={index} item={item} isLast={index === ITINERARY.day3.length - 1} onShowLocation={setSelectedPlace} />
-                                ))}
-                                <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 mt-4 flex gap-3 text-sm text-rose-900 shadow-sm">
-                                    <Icons.Train className="w-5 h-5 shrink-0 text-rose-600" />
-                                    <p className="font-medium">注意：泰國火車誤點屬常態，請以現場公告為準。司機會在 Tham Krasae 接你們。</p>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'info' && (
-                            <div className="space-y-4 animate-slide-up">
-                                {/* 走失與應變策略 */}
-                                <TipsCard title="走失應變與會合 (Lost & Found)" iconName="Users" color="red">
-                                    <div className="space-y-3 mt-1">
-                                        <p className="text-gray-700 font-bold">約定會合點 (Meeting Points):</p>
-                                        <ul className="list-disc pl-5 space-y-1 text-gray-600 mb-4">
-                                            <li><strong>景點:</strong> 一律在「售票口」或「入口明顯招牌」下。</li>
-                                            <li><strong>飯店:</strong> 大廳櫃台 (Lobby Reception)。</li>
-                                            <li><strong>夜市/人多處:</strong> 下車地點的原地。</li>
-                                        </ul>
-                                        
-                                        <p className="text-gray-700 font-bold">若真的走失 (Action Plan):</p>
-                                        <ol className="list-decimal pl-5 space-y-1 text-gray-600 mb-4">
-                                            <li>留在原地，不要亂跑。</li>
-                                            <li>打電話/傳訊息給司機或同伴。</li>
-                                            <li>若語言不通，請點擊下方紅色按鈕求助路人。</li>
-                                        </ol>
-
-                                        <button 
-                                            onClick={() => setShowSOS(true)}
-                                            className="w-full bg-red-600 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-red-700 active:scale-95 transition-all"
-                                        >
-                                            <Icons.Siren className="w-5 h-5 animate-pulse" />
-                                            顯示泰文求救卡 (Show SOS Card)
-                                        </button>
-                                    </div>
-                                </TipsCard>
-
-                                <TipsCard title="必帶物品清單" iconName="ShieldAlert" color="rose">
-                                    <ul className="space-y-2 mt-1">
-                                        <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> <strong>溯溪鞋/防滑涼鞋</strong> (Day 2 瀑布必備)</li>
-                                        <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> <strong>泳衣/快乾衣/毛巾</strong> (瀑布玩水)</li>
-                                        <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> <strong>乾袋/防水袋</strong> (保護手機相機)</li>
-                                        <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> 防蚊液、防曬、帽子</li>
-                                        <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> 現金 (部分門票/小吃攤)</li>
-                                    </ul>
-                                </TipsCard>
-
-                                <TipsCard title="重要電話" iconName="Phone" color="amber">
-                                    <div className="space-y-3 mt-1">
-                                        <div className="flex justify-between items-center border-b border-amber-200/50 pb-2">
-                                            <span>Keeree Tara 餐廳</span>
-                                            <a href="tel:+6634513855" className="bg-white px-3 py-1 rounded-full text-xs font-mono font-bold text-amber-600 border border-amber-200">+66 34 513 855</a>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span>Bubble in the Forest</span>
-                                            <a href="tel:0657276888" className="bg-white px-3 py-1 rounded-full text-xs font-mono font-bold text-amber-600 border border-amber-200">065-727-6888</a>
-                                        </div>
-                                    </div>
-                                </TipsCard>
-                                
-                                <div className="mt-8 pt-6 border-t border-gray-200 text-center text-gray-400 text-xs pb-10">
-                                    <p>祝旅途愉快 Have a nice trip!</p>
-                                    <p className="mt-1 opacity-50">Designed for 2026 Bangkok Trip</p>
-                                </div>
-                            </div>
-                        )}
+                    <main className="px-5 pt-4 pb-24">
+                        {renderContent()}
                     </main>
 
-                    {/* Footer Button */}
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white via-white/95 to-transparent max-w-md mx-auto z-30">
+                    {/* Bottom Floating Action Button */}
+                    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
                         <a 
                             href="https://www.google.com/maps/search/?api=1&query=Kanchanaburi" 
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full bg-slate-800 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-slate-200 hover:bg-slate-900 transition-colors active:scale-95"
+                            className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl hover:scale-105 transition-transform active:scale-95"
                         >
-                            <Icons.MapPin className="w-5 h-5 text-green-400" />
-                            開啟 Google Maps 概覽
+                            <Icons.MapPin size={18} className="text-green-400" />
+                            <span className="font-bold text-sm">Open Full Map</span>
                         </a>
                     </div>
 
                     {/* Modals */}
-                    {selectedPlace && (
-                        <DriverCard place={selectedPlace} onClose={() => setSelectedPlace(null)} />
-                    )}
-                    {showSOS && (
-                        <SOSCard onClose={() => setShowSOS(false)} />
-                    )}
+                    {selectedPlace && <DriverCard place={selectedPlace} onClose={() => setSelectedPlace(null)} />}
+                    {showSOS && <SOSCard onClose={() => setShowSOS(false)} />}
                 </div>
             );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<TripApp />);
     </script>
 </body>
 </html>
