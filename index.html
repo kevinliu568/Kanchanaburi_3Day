@@ -31,6 +31,21 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        /* 動畫效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out forwards;
+        }
     </style>
 </head>
 <body>
@@ -61,26 +76,28 @@
             Phone: (props) => <Icon {...props} path={<><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></>} />,
             Navigation: (props) => <Icon {...props} path={<><polygon points="3 11 22 2 13 21 11 13 3 11"/></>} />,
             X: (props) => <Icon {...props} path={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />,
-            ArrowRight: (props) => <Icon {...props} path={<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>} />
+            ArrowRight: (props) => <Icon {...props} path={<><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></>} />,
+            Users: (props) => <Icon {...props} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
+            Siren: (props) => <Icon {...props} path={<><path d="M7 12a5 5 0 0 1 5-5v0a5 5 0 0 1 5 5v6H7v-6Z"/><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v2H5v-2Z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.929 4.929.707.707"/><path d="M12 12v6"/></>} />
         };
 
-        // --- Data ---
+        // --- Data (Updated with Chinese/English Names) ---
         const TRIP_DATES = "2026/01/30 - 02/01";
         const PLACES = {
-          hotel_bkk_start: { id: 'hotel_bkk_start', name: 'Holiday Inn Bangkok Sukhumvit', nameThai: 'ฮอลิเดย์ อินน์ กรุงเทพฯ สุขุมวิท', address: '1 Sukhumvit 22, Klongton, Klongtoey, Bangkok 10110', googleQuery: 'Holiday Inn Bangkok Sukhumvit', type: 'hotel' },
-          bubble: { id: 'bubble', name: 'Bubble in the Forest Café', nameThai: 'บับเบิ้ล อิน เดอะ ฟอเรสต์ คาเฟ่', address: '170 Charoen Tha Alley, Bang Toei, Sam Phran District, Nakhon Pathom 73170', googleQuery: 'Bubble in the Forest', type: 'food' },
+          hotel_bkk_start: { id: 'hotel_bkk_start', name: '曼谷素坤逸假日酒店 (Holiday Inn Bangkok Sukhumvit)', nameThai: 'ฮอลิเดย์ อินน์ กรุงเทพฯ สุขุมวิท', address: '1 Sukhumvit 22, Klongton, Klongtoey, Bangkok 10110', googleQuery: 'Holiday Inn Bangkok Sukhumvit', type: 'hotel' },
+          bubble: { id: 'bubble', name: '森林泡泡咖啡廳 (Bubble in the Forest)', nameThai: 'บับเบิ้ล อิน เดอะ ฟอเรสต์ คาเฟ่', address: '170 Charoen Tha Alley, Bang Toei, Sam Phran District, Nakhon Pathom 73170', googleQuery: 'Bubble in the Forest', type: 'food' },
           phra_pathom: { id: 'phra_pathom', name: '佛統大塔 (Phra Pathom Chedi)', nameThai: 'วัดพระปฐมเจดีย์ราชวรมหาวิหาร', address: 'Nakhon Pathom', googleQuery: 'Phra Pathom Chedi', type: 'attraction' },
           tiger_cave: { id: 'tiger_cave', name: '虎窟寺 (Wat Tham Suea)', nameThai: 'วัดถ้ำเสือ', address: 'Muang Chum, Tha Muang District, Kanchanaburi', googleQuery: 'Wat Tham Suea Kanchanaburi', type: 'attraction' },
-          hotel_kan: { id: 'hotel_kan', name: 'Royal River Kwai Resort & Spa', nameThai: 'รอยัล ริเวอร์แคว รีสอร์ท แอนด์ สปา', address: '88 Moo 2, Kanchanaburi-Saiyok Road, Kangsean, Muang, Kanchanaburi 71000', googleQuery: 'Royal River Kwai Resort & Spa', type: 'hotel' },
+          hotel_kan: { id: 'hotel_kan', name: '皇家桂河度假村 (Royal River Kwai Resort)', nameThai: 'รอยัล ริเวอร์แคว รีสอร์ท แอนด์ สปา', address: '88 Moo 2, Kanchanaburi-Saiyok Road, Kangsean, Muang, Kanchanaburi 71000', googleQuery: 'Royal River Kwai Resort & Spa', type: 'hotel' },
           skywalk: { id: 'skywalk', name: '北碧天空步道 (Skywalk)', nameThai: 'สกายวอร์ค กาญจนบุรี', address: 'Songkwai Rd, Ban Tai/Ban Nuea, Mueang Kanchanaburi', googleQuery: 'Skywalk Kanchanaburi City', type: 'attraction' },
-          keeree_tara: { id: 'keeree_tara', name: 'Keeree Tara (晚餐)', nameThai: 'คีรีธารา', address: 'River Kwai Rd, Ban Tai, Mueang Kanchanaburi 71000', googleQuery: 'Keeree Tara Restaurant', type: 'food' },
+          keeree_tara: { id: 'keeree_tara', name: 'Keeree Tara 河景晚餐', nameThai: 'คีรีธารา', address: 'River Kwai Rd, Ban Tai, Mueang Kanchanaburi 71000', googleQuery: 'Keeree Tara Restaurant', type: 'food' },
           erawan: { id: 'erawan', name: 'Erawan 國家公園瀑布', nameThai: 'อุทยานแห่งชาติเอราวัณ', address: 'Erawan Waterfall, Kanchanaburi', googleQuery: 'Erawan National Park', type: 'attraction' },
           safari: { id: 'safari', name: '北碧野生動物園 (Safari Park)', nameThai: 'สวนสัตว์เปิด ซาฟารี ปาร์ค', address: '99 Lat Ya–Bo Phloi Rd, Nong Kum, Bo Phloi, Kanchanaburi 71160', googleQuery: 'Safari Park Open Zoo Kanchanaburi', type: 'attraction' },
-          bridge_morning: { id: 'bridge_morning', name: '桂河大橋 (晨拍)', nameThai: 'สะพานข้ามแม่น้ำแคว', address: 'Thamuang, Kanchanaburi', googleQuery: 'River Kwai Bridge', type: 'attraction' },
+          bridge_morning: { id: 'bridge_morning', name: '桂河大橋 (River Kwai Bridge)', nameThai: 'สะพานข้ามแม่น้ำแคว', address: 'Thamuang, Kanchanaburi', googleQuery: 'River Kwai Bridge', type: 'attraction' },
           tbrc: { id: 'tbrc', name: '泰緬鐵路博物館 (TBRC)', nameThai: 'พิพิธภัณฑ์ทางรถไฟไทย-พม่า', address: '73 Jaokunnuern Rd, Ban Nuea, Mueang Kanchanaburi 71000', googleQuery: 'Thailand–Burma Railway Centre', type: 'attraction' },
           kan_station: { id: 'kan_station', name: '北碧火車站 (上車點)', nameThai: 'สถานีรถไฟกาญจนบุรี', address: 'Kanchanaburi Railway Station', googleQuery: 'Kanchanaburi Railway Station', type: 'transport' },
           tham_krasae: { id: 'tham_krasae', name: 'Tham Krasae (木棧道/下車點)', nameThai: 'สถานีรถไฟถ้ำกระแซ', address: 'Tham Krasae', googleQuery: 'Saphan Tham Krasae', type: 'attraction' },
-          hotel_bkk_end: { id: 'hotel_bkk_end', name: 'Holiday Inn Bangkok (IHG)', nameThai: 'ฮอลิเดย์ อินน์ กรุงเทพฯ', address: '981 Silom Rd, Bangrak, Bangkok 10500 (請確認分館)', googleQuery: 'Holiday Inn Bangkok Silom', type: 'hotel' }
+          hotel_bkk_end: { id: 'hotel_bkk_end', name: '曼谷假日酒店 (Holiday Inn Bangkok)', nameThai: 'ฮอลิเดย์ อินน์ กรุงเทพฯ', address: '981 Silom Rd, Bangrak, Bangkok 10500 (請確認分館)', googleQuery: 'Holiday Inn Bangkok Silom', type: 'hotel' }
         };
 
         const ITINERARY = {
@@ -114,8 +131,8 @@
 
         // --- Components ---
 
+        // 1. Driver/Location Card
         const DriverCard = ({ place, onClose }) => {
-            // 防止背景滾動
             useEffect(() => {
                 document.body.style.overflow = 'hidden';
                 return () => { document.body.style.overflow = 'unset'; };
@@ -148,8 +165,57 @@
                             className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-lg shadow-blue-200"
                         >
                             <Icons.Navigation className="w-6 h-6" />
-                            Open Google Maps
+                            開啟地圖 (Google Maps)
                         </a>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. SOS / Emergency Card
+        const SOSCard = ({ onClose }) => {
+            useEffect(() => {
+                document.body.style.overflow = 'hidden';
+                return () => { document.body.style.overflow = 'unset'; };
+            }, []);
+
+            return (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-red-600/90 p-4 animate-fade-in" onClick={onClose}>
+                    <div className="bg-white rounded-2xl p-6 w-full max-w-sm space-y-6 text-center shadow-2xl relative border-4 border-red-500" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center border-b border-gray-100 pb-2">
+                            <h3 className="text-red-600 font-bold text-lg flex items-center gap-2">
+                                <Icons.Siren className="w-6 h-6" /> 緊急求救 SOS
+                            </h3>
+                            <button onClick={onClose} className="p-2 -mr-2 hover:bg-red-50 rounded-full text-gray-400">
+                                <Icons.X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        
+                        <div className="space-y-6">
+                            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                                <p className="text-sm text-gray-500 mb-1">我是遊客，我迷路了</p>
+                                <p className="text-3xl font-bold text-gray-900 font-thai leading-snug">
+                                    ฉันหลงทาง<br/>ช่วยฉันด้วย
+                                </p>
+                            </div>
+
+                            <div className="bg-red-50 p-4 rounded-xl border border-red-100">
+                                <p className="text-sm text-gray-500 mb-1">請幫我打電話給這個號碼</p>
+                                <p className="text-xl font-bold text-gray-900 font-thai mb-2">
+                                    ช่วยโทรหาเบอร์นี้ให้หน่อย
+                                </p>
+                                <div className="h-10 border-b-2 border-dashed border-gray-300 flex items-end justify-center text-gray-400 font-mono">
+                                    (在此填寫司機電話)
+                                </div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={onClose}
+                            className="w-full bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                        >
+                            關閉 Close
+                        </button>
                     </div>
                 </div>
             );
@@ -210,11 +276,13 @@
                 blue: "bg-blue-50 text-blue-900 border-blue-100",
                 amber: "bg-amber-50 text-amber-900 border-amber-100",
                 rose: "bg-rose-50 text-rose-900 border-rose-100",
+                red: "bg-red-50 text-red-900 border-red-100"
             };
             const iconColors = {
                 blue: "text-blue-600",
                 amber: "text-amber-600",
                 rose: "text-rose-600",
+                red: "text-red-600"
             };
 
             return (
@@ -233,6 +301,7 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('day1');
             const [selectedPlace, setSelectedPlace] = useState(null);
+            const [showSOS, setShowSOS] = useState(false);
 
             // 處理捲動到頂部
             const handleTabChange = (tab) => {
@@ -282,7 +351,7 @@
                     {/* Main Content */}
                     <main className="px-5 pb-10">
                         {activeTab === 'day1' && (
-                            <div className="space-y-1 animate-fade-in-up">
+                            <div className="space-y-1 animate-slide-up">
                                 <div className="flex items-center gap-2 mb-6 ml-1">
                                     <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
                                     <div>
@@ -297,7 +366,7 @@
                         )}
 
                         {activeTab === 'day2' && (
-                            <div className="space-y-1 animate-fade-in-up">
+                            <div className="space-y-1 animate-slide-up">
                                 <div className="flex items-center gap-2 mb-6 ml-1">
                                     <div className="w-1 h-8 bg-amber-500 rounded-full"></div>
                                     <div>
@@ -316,7 +385,7 @@
                         )}
 
                         {activeTab === 'day3' && (
-                            <div className="space-y-1 animate-fade-in-up">
+                            <div className="space-y-1 animate-slide-up">
                                 <div className="flex items-center gap-2 mb-6 ml-1">
                                     <div className="w-1 h-8 bg-rose-500 rounded-full"></div>
                                     <div>
@@ -335,7 +404,34 @@
                         )}
 
                         {activeTab === 'info' && (
-                            <div className="space-y-4 animate-fade-in-up">
+                            <div className="space-y-4 animate-slide-up">
+                                {/* 走失與應變策略 */}
+                                <TipsCard title="走失應變與會合 (Lost & Found)" iconName="Users" color="red">
+                                    <div className="space-y-3 mt-1">
+                                        <p className="text-gray-700 font-bold">約定會合點 (Meeting Points):</p>
+                                        <ul className="list-disc pl-5 space-y-1 text-gray-600 mb-4">
+                                            <li><strong>景點:</strong> 一律在「售票口」或「入口明顯招牌」下。</li>
+                                            <li><strong>飯店:</strong> 大廳櫃台 (Lobby Reception)。</li>
+                                            <li><strong>夜市/人多處:</strong> 下車地點的原地。</li>
+                                        </ul>
+                                        
+                                        <p className="text-gray-700 font-bold">若真的走失 (Action Plan):</p>
+                                        <ol className="list-decimal pl-5 space-y-1 text-gray-600 mb-4">
+                                            <li>留在原地，不要亂跑。</li>
+                                            <li>打電話/傳訊息給司機或同伴。</li>
+                                            <li>若語言不通，請點擊下方紅色按鈕求助路人。</li>
+                                        </ol>
+
+                                        <button 
+                                            onClick={() => setShowSOS(true)}
+                                            className="w-full bg-red-600 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-red-700 active:scale-95 transition-all"
+                                        >
+                                            <Icons.Siren className="w-5 h-5 animate-pulse" />
+                                            顯示泰文求救卡 (Show SOS Card)
+                                        </button>
+                                    </div>
+                                </TipsCard>
+
                                 <TipsCard title="必帶物品清單" iconName="ShieldAlert" color="rose">
                                     <ul className="space-y-2 mt-1">
                                         <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> <strong>溯溪鞋/防滑涼鞋</strong> (Day 2 瀑布必備)</li>
@@ -343,14 +439,6 @@
                                         <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> <strong>乾袋/防水袋</strong> (保護手機相機)</li>
                                         <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> 防蚊液、防曬、帽子</li>
                                         <li className="flex gap-2 items-start"><span className="text-rose-400 font-bold">✓</span> 現金 (部分門票/小吃攤)</li>
-                                    </ul>
-                                </TipsCard>
-
-                                <TipsCard title="雨備 & 應變" iconName="CloudRain" color="blue">
-                                    <ul className="space-y-3 mt-1">
-                                        <li className="bg-white/50 p-2 rounded"><strong>Day 1 塞車/下雨：</strong><br/>保住 Skywalk (短停) 與 Keeree Tara 晚餐，佛統大塔可略過。</li>
-                                        <li className="bg-white/50 p-2 rounded"><strong>Day 2 下雨：</strong><br/>瀑布只走 1-2 層拍照，動物園看情況調整。</li>
-                                        <li className="bg-white/50 p-2 rounded"><strong>Day 3 火車誤點：</strong><br/>若太嚴重，直接包車去 Tham Krasae 走木棧道，不去搭火車。</li>
                                     </ul>
                                 </TipsCard>
 
@@ -388,9 +476,12 @@
                         </a>
                     </div>
 
-                    {/* Modal */}
+                    {/* Modals */}
                     {selectedPlace && (
                         <DriverCard place={selectedPlace} onClose={() => setSelectedPlace(null)} />
+                    )}
+                    {showSOS && (
+                        <SOSCard onClose={() => setShowSOS(false)} />
                     )}
                 </div>
             );
